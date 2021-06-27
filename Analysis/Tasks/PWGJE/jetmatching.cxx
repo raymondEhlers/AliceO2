@@ -28,16 +28,16 @@ using namespace o2::framework::expressions;
 void customize(std::vector<o2::framework::ConfigParamSpec>& workflowOptions)
 {
   ConfigParamSpec jetMatching = {"jet-matching",
-                               VariantType::String,
-                               "",
-                               {"Jet collections to match, separated by commas. Example: \"MCDetectorLevel-MCParticleLevel\". Possible components: MCParticleLevel, MCDetectorLevel, HybridIntermediate, Hybrid"}};
+                                 VariantType::String,
+                                 "",
+                                 {"Jet collections to match, separated by commas. Example: \"MCDetectorLevel-MCParticleLevel\". Possible components: MCParticleLevel, MCDetectorLevel, HybridIntermediate, Hybrid"}};
   workflowOptions.push_back(jetMatching);
 }
 
 #include "Framework/runDataProcessing.h"
 
 //template<typename BaseJetCollection, typename TagJetCollection, typename Collision>
-template<typename BaseJetCollection, typename BaseJetCollectionMatching, typename TagJetCollection, typename TagJetCollectionMatching>
+template <typename BaseJetCollection, typename BaseJetCollectionMatching, typename TagJetCollection, typename TagJetCollectionMatching>
 struct JetMatching {
   Configurable<float> maxMatchingDistance{"maxMatchingDistance", 0.4f, "Max matching distance"};
   Produces<BaseJetCollectionMatching> jetsBaseMatching;
@@ -61,14 +61,14 @@ struct JetMatching {
     }
     std::vector<double> jetsTagPhi(jetsTag.size());
     std::vector<double> jetsTagEta(jetsTag.size());
-    for (auto & jet : jetsTag) {
+    for (auto& jet : jetsTag) {
       jetsTagPhi.emplace_back(jet.phi());
       jetsTagEta.emplace_back(jet.eta());
     }
-    auto && [baseToTagIndexMap, tagToBaseIndexMap] = JetUtilities::MatchJetsGeometrically(jetsBasePhi, jetsBaseEta, jetsTagPhi, jetsTagEta, maxMatchingDistance);
+    auto&& [baseToTagIndexMap, tagToBaseIndexMap] = JetUtilities::MatchJetsGeometrically(jetsBasePhi, jetsBaseEta, jetsTagPhi, jetsTagEta, maxMatchingDistance);
 
     unsigned int i = 0;
-    for (auto & jet : jetsBase) {
+    for (auto& jet : jetsBase) {
       // Store results
       //jetsBaseMatching(jet.lastIndex(), baseToTagIndexMap[i]);
       //jet.MatchedJetIndex(baseToTagIndexMap[i]);
@@ -79,7 +79,7 @@ struct JetMatching {
     }*/
     i = 0;
     //for (std::size_t i; i < tagToBaseIndexMap.size(); ++i) {
-    for (auto & jet : jetsTag) {
+    for (auto& jet : jetsTag) {
       // Store results...
       //jetsTag[i].MatchedJetIndex = tagToBaseIndexMap[i];
       //jet.MatchedJetIndex(tagToBaseIndexMap[i]);
@@ -129,9 +129,8 @@ WorkflowSpec defineDataProcessing(ConfigContext const& cfgc)
   }
   return WorkflowSpec{tasks};*/
   return WorkflowSpec{
-      adaptAnalysisTask<JetMatching<o2::aod::Jets, o2::aod::MatchedJets, o2::aod::HybridIntermediateJets, o2::aod::MatchedHybridIntermediateJets>>(
-        cfgc, TaskName{"jet-matching-hybrid-sub-to-hybrid-intermedaite"})};
+    adaptAnalysisTask<JetMatching<o2::aod::Jets, o2::aod::MatchedJets, o2::aod::HybridIntermediateJets, o2::aod::MatchedHybridIntermediateJets>>(
+      cfgc, TaskName{"jet-matching-hybrid-sub-to-hybrid-intermedaite"})};
   /*return WorkflowSpec{
     adaptAnalysisTask<JetFinderTaskCharged>(cfgc, TaskName{"jet-finder-charged"})};*/
 }
-
